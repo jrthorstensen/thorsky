@@ -1,5 +1,5 @@
 # thorsky
-Python time-and-the-sky programs built mostly on astropy.
+Python time-and-the-sky programs built mostly on astropy.  Includes some routines that are lighter-weight and faster than their astropy counterparts while retaining precision adequate for most purposes.
 
 Unlike the deprecated 'pyskycalc3' this has a setup.py file so it can be installed easily.
 

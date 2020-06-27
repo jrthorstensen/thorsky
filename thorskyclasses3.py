@@ -788,7 +788,7 @@ class Observation :
         
         totalvel = earthvel + diurnalvel 
 
-        self.baryvcorr = totalvel.dot(self.celest.cartesian).to(u.km/u.s)
+        self.baryvcorr = totalvel.dot(self.cel_J2000.cartesian).to(u.km/u.s)
 
         # print("self.barytcorr ",self.barytcorr,"self.baryvcorr",self.baryvcorr)
  
@@ -863,7 +863,7 @@ class Observation :
                 # angle between sun and earth as viewed from planet
                 phaseang = angle_between(psun,pearth)
                 # print "phaseang:",phaseang
-                phasefac = np.polyval(thorconsts.PLANETPHASECOEFS[p],phaseang)
+                phasefac = np.polyval(thorconsts.PLANETPHASECOEFS[p],phaseang.value)
                 # print "phasefac:",phasefac
                 self.planetmags[p] = phasefac + 5. * np.log10(psundist.to(u.AU).value * pearthdist.to(u.AU).value)
                 # print "mag:",self.planetmags[p]
@@ -1136,7 +1136,7 @@ class Observation :
             elif maxalt < thorconsts.ALT15 : self.uptime15 = thorconsts.ZERO_TIMEDELTA
             #print("time above 1.5 airm", self.uptime15)
 
-    def printnow(self) :
+    def printnow(self, use_slow_bary = False) :
         """Compute the instantaneous circumstances to ensure they're current and 
         print out a nicely formatted display."""
 
@@ -1145,7 +1145,10 @@ class Observation :
         self.computesky()
         self.computesunmoon()
         self.computeplanets()
-        self.computebary()
+        if use_slow_bary :
+            self.computebary()
+        else :
+            self.computequickbary()
 
         print(" ")
         print("Site : %s;  E longit = %s, lat = %s" % (self.site.name,

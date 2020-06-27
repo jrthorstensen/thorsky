@@ -409,7 +409,7 @@ def true_airmass(altit) :
     seczmin1 = secz - 1.
     coefs = [-4.716679E-5, 1.351167E-3,  3.033104E-3, 2.879465E-3, 0.]
     # print "poly gives",  np.polyval(coefs,seczmin1)
-    return (secz - np.polyval(coefs,seczmin1))
+    return (secz.value - np.polyval(coefs,seczmin1.value))
 
 def geocent(geolong, geolat, height) :
         """geocentric XYZ coordinates for a location at a longitude,

@@ -1,0 +1,1051 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>thorsky package &#8212; thorsky 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">thorsky 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="thorsky-package">
+<h1>thorsky package<a class="headerlink" href="#thorsky-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-thorsky.thorskyclasses3">
+<span id="thorsky-thorskyclasses3-module"></span><h2>thorsky.thorskyclasses3 module<a class="headerlink" href="#module-thorsky.thorskyclasses3" title="Permalink to this headline">¶</a></h2>
+<p>thorskyclasses.py – classes used for observational
+circumstances.</p>
+<dl class="class">
+<dt id="thorsky.thorskyclasses3.Observation">
+<em class="property">class </em><code class="descclassname">thorsky.thorskyclasses3.</code><code class="descname">Observation</code><span class="sig-paren">(</span><em>celest=None</em>, <em>t=None</em>, <em>site=None</em>, <em>default_site='mdm'</em>, <em>use_local_time=True</em>, <em>ra_unit=Unit(&quot;hourangle&quot;)</em>, <em>dec_unit=Unit(&quot;deg&quot;)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Circumstances of an observation at a given SkyCoord, obs_site, and time.</p>
+<p>This is the main class, used to compute time-and-the-sky information.</p>
+<p>A minimal use example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="kn">import</span> <span class="nn">thorsky.thorskyutil</span> <span class="k">as</span> <span class="nn">tsu</span>
+<span class="kn">import</span> <span class="nn">thorsky.thorskyclasses3</span> <span class="k">as</span> <span class="nn">tsc3</span>
+
+<span class="n">o</span> <span class="o">=</span> <span class="n">tsc3</span><span class="o">.</span><span class="n">Observation</span><span class="p">()</span>      <span class="c1"># defaults to zenith at default site at present moment</span>
+
+<span class="n">o</span><span class="o">.</span><span class="n">computesky</span><span class="p">()</span>              <span class="c1"># hour angle, airmass, and more</span>
+<span class="n">o</span><span class="o">.</span><span class="n">computesunmoon</span><span class="p">()</span>          <span class="c1"># note that the order in which these are called is important</span>
+<span class="n">o</span><span class="o">.</span><span class="n">computequickbary</span><span class="p">()</span>
+<span class="n">o</span><span class="o">.</span><span class="n">setnightevents</span><span class="p">()</span>
+<span class="n">o</span><span class="o">.</span><span class="n">computeplanets</span><span class="p">()</span>
+
+<span class="n">o</span><span class="o">.</span><span class="n">printnow</span><span class="p">()</span>                <span class="c1"># see what you have</span>
+<span class="n">o</span><span class="o">.</span><span class="n">printnight</span><span class="p">()</span> 
+</pre></div>
+</div>
+<p>This class has a huge number of attributes.  To avoid unneeded computation,
+these are mostly left blank unless computed explicitly using the methods 
+provided.</p>
+<p>The order in which you call the methods that compute results is important
+since results are cumulative:  In sum:</p>
+<ul class="simple">
+<li>computesky needs to be first</li>
+<li>computesunmoon, if needed, is second.</li>
+<li>computequickbary depends on computesky but nothing else</li>
+<li>setnightevents depends on both computesky and computesunmoon</li>
+<li>hours_up depends on computesky, computesunmoon, and setnightevents</li>
+<li>computeplanets depends on computsky and computesunmoon.</li>
+</ul>
+<p>These have been split out to save compute time.  For example, if you only 
+need airmass, all you need to run is computesky, but if you want to know 
+if the moon is up you need to run computesunmoon as well.</p>
+<p>Parameters :</p>
+<dl class="docutils">
+<dt>celest <span class="classifier-delimiter">:</span> <span class="classifier">SkyCoord, or string, or list, or tuple; optional</span></dt>
+<dd>Celestial location of the observation.  Defaults to the zenith for the site and time.
+A wide variety of input formats are permissible; see ‘setcelest’ below.</dd>
+<dt>t <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time, or string, or tuple, or float; optional</span></dt>
+<dd>Instant at which observation occurs.  Default is time at which code is executed.
+Also accepts a wide variety of inputs.</dd>
+<dt>site <span class="classifier-delimiter">:</span> <span class="classifier">obs_site, or str; optional</span></dt>
+<dd>Site on earth from which observations are taken.  Usually passed as a key from
+the builtin dictionary of sites, but can be a obs_site instance.
+Default is ‘mdm’.</dd>
+<dt>use_local_time <span class="classifier-delimiter">:</span> <span class="classifier">boolean; optional</span></dt>
+<dd>Report results in local time; alternative is UT.  Default is True.</dd>
+<dt>ra_unit <span class="classifier-delimiter">:</span> <span class="classifier">astropy.unit; optional </span></dt>
+<dd>unit for ra input; default is u.hourangle, which I wish they’d named something 
+different since it’s a term of art.</dd>
+<dt>dec_unit <span class="classifier-delimiter">:</span> <span class="classifier">astropy.unit; optional</span></dt>
+<dd>unit for dec input; default is u.deg</dd>
+</dl>
+<p>Attributes :</p>
+<dl class="docutils">
+<dt>site <span class="classifier-delimiter">:</span> <span class="classifier">obs_site </span></dt>
+<dd>The observer’s site.</dd>
+<dt>celest <span class="classifier-delimiter">:</span> <span class="classifier">astropy SkyCoord </span></dt>
+<dd>celestial position observed.</dd>
+<dt>t <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>instant in time of the observation.</dd>
+<dt>julyear <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd>julian year corresponding to t.</dd>
+<dt>lst <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>local sidereal time, computed to about 1 sec bypassing slow astropy routines.</dd>
+<dt>nowfr <span class="classifier-delimiter">:</span> <span class="classifier">astropy coordinate frame </span></dt>
+<dd>FK5 frame for equinox of obsevation (‘of date’)</dd>
+<dt>hanow <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>hour angle (from meridian)</dd>
+<dt>airmass <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd>true airmass (not secant-z)</dd>
+<dt>cel_J2000 <span class="classifier-delimiter">:</span> <span class="classifier">astropy SkyCoord  </span></dt>
+<dd>celestial location for J2000.</dd>
+<dt>icrs2now <span class="classifier-delimiter">:</span> <span class="classifier">numpy array </span></dt>
+<dd>rotation matrix to transform cartesian icrs to present equinox</dd>
+<dt>current2topoxyz <span class="classifier-delimiter">:</span> <span class="classifier">numpy array </span></dt>
+<dd>rotation matrix to transform current equinox to topocentric XYZ</dd>
+<dt>icrs2topoxyz <span class="classifier-delimiter">:</span> <span class="classifier">numpy array</span></dt>
+<dd>matrix product of icrs2now and current2topoxyz; tranforms icrs to topocentric XYZ</dd>
+<dt>constel <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>IAU abbreviation of the constellation, e.g. ‘UMa’</dd>
+<dt>previouslstmid <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>sidereal time of previous night’s midnight</dd>
+<dt>moonpos <span class="classifier-delimiter">:</span> <span class="classifier">SkyCoord </span></dt>
+<dd>topocentric moon celestial position to about 10 arcsec precision in current equinox</dd>
+<dt>moonobjang <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>angle subtended by Observation’s celest and the moon</dd>
+<dt>moonphasedescr <span class="classifier-delimiter">:</span> <span class="classifier">string </span></dt>
+<dd>human-readable description of the moon phase</dd>
+<dt>moonillumfrac <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd>fraction of moon’s face that is illuminated (0. to 1.)</dd>
+<dt>moonaltit <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>elevation of moon above horizon</dd>
+<dt>lunskybrightness <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd>predicted sky brightness added by the moon in mag per square arcsec</dd>
+<dt>sunpos <span class="classifier-delimiter">:</span> <span class="classifier">astropy SkyCoord </span></dt>
+<dd>sun position to about 0.01 degrees</dd>
+<dt>sunobjang <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>angle subtended by sun and moon</dd>
+<dt>sunaltit <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>elevation of sun center above horizon (no refraction)</dd>
+<dt>sunaz <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>azimuth of sun</dd>
+<dt>twi <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd>rough zenight twilight brightness in blue mag per square arcsec</dd>
+<dt>lstmid <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle </span></dt>
+<dd>local sidereal time at midnight</dd>
+<dt>tsunset, tsunrise <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>times of sunset and sunrise on present night</dd>
+<dt>tevetwi, tmorntwi <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>end and start of astronomical (18-degr) twilight</dd>
+<dt>teve12,tmorn12 <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>end and start of nautical (12-degr) twilight</dd>
+<dt>tnightcenter <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>time of lower culmination of the sun</dd>
+<dt>uptime30, uptime20, uptime15 <span class="classifier-delimiter">:</span> <span class="classifier">astropy TimeDelta </span></dt>
+<dd>How long object has &lt;3, &lt;2, and &lt;1.5 airmasses during night defined by 12-deg twilight.</dd>
+<dt>barytcorr <span class="classifier-delimiter">:</span> <span class="classifier">astropy TimeDelta </span></dt>
+<dd>Amount to add to Observation.t to get arrival time at barycenter</dd>
+<dt>baryvcorr <span class="classifier-delimiter">:</span> <span class="classifier">astropy Quantity </span></dt>
+<dd>velocity to add to shift velocity to solar system barycenter frame</dd>
+<dt>planetdict <span class="classifier-delimiter">:</span> <span class="classifier">Dictionary of astropy SkyCoords </span></dt>
+<dd>sky positions of planets, keyed by lowercase name</dd>
+<dt>planetmags <span class="classifier-delimiter">:</span> <span class="classifier">Dictionary of floats  </span></dt>
+<dd>apparent magnitudes of planets</dd>
+</dl>
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.advancetime">
+<code class="descname">advancetime</code><span class="sig-paren">(</span><em>delta</em>, <em>forward=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.advancetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.advancetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance Observation.t by the specified amount.</p>
+<dl class="docutils">
+<dt>delta <span class="classifier-delimiter">:</span> <span class="classifier">Amount to advance the time, as an astropy TimeDelta, or a string </span></dt>
+<dd>such as “143 s” or “5 d” (see below), or a float in sec.</dd>
+</dl>
+<p>forward : boolean : if True, go forward; if False, go back.</p>
+<p>When specifying the interval with a string, the codes for units are</p>
+<ul class="simple">
+<li>s - second</li>
+<li>m - minute</li>
+<li>h - hour</li>
+<li>t - 1 sidereal day (transit-to-transit)</li>
+<li>d - 1 solar day</li>
+<li>w - one week of solar days</li>
+<li>l - one lunation</li>
+<li>y - one Julian year of 365.25 days</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.compute_hours_up">
+<code class="descname">compute_hours_up</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.compute_hours_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.compute_hours_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute how long an object is up during the night, defined by
+12-degree (or nautical) twilight.  This requires setnightevents 
+to have been run previously.  Computes how long the object is less
+that 3.0 airmass, 2.0 airmasses, and 1.5 airmasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.computebary">
+<code class="descname">computebary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.computebary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.computebary" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes and set bary corrections using astropy routines.  Slow; nearly all users will want ‘computequickbary’.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.computeplanets">
+<code class="descname">computeplanets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.computeplanets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.computeplanets" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute and store planetary positions and magnitudes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.computequickbary">
+<code class="descname">computequickbary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.computequickbary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.computequickbary" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute and set barycentric corrections to 0.1s and 10m/s. Reasonably fast.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.computesky">
+<code class="descname">computesky</code><span class="sig-paren">(</span><em>redo_coords=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.computesky"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.computesky" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute basic observational circumstances.</p>
+<p>Quantities computed include lst, current-equinox coords, 
+hour angle, alt, az, parallactic angle, midhight, LST mid,.  Precession to
+current equinox can be suppressed for speed.</p>
+<p>redo_coords : boolean, defaults to true. If False, turns off precession.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.computesunmoon">
+<code class="descname">computesunmoon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.computesunmoon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.computesunmoon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and set the many moon and sun quantities.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.printnight">
+<code class="descname">printnight</code><span class="sig-paren">(</span><em>use_local_time=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.printnight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.printnight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a nicely formatted display of the rise/set times etc..</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.printnow">
+<code class="descname">printnow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.printnow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.printnow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the instantaneous circumstances to ensure they’re current and 
+print out a nicely formatted display.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.setcelest">
+<code class="descname">setcelest</code><span class="sig-paren">(</span><em>celestin</em>, <em>ra_unit=Unit(&quot;hourangle&quot;)</em>, <em>dec_unit=Unit(&quot;deg&quot;)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.setcelest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.setcelest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the celestial coords.</p>
+<p>Input can be a SkyCoord instance, a list or tuple of (ra,dec) or
+(ra,dec,equinox), or a character string.</p>
+<p>celestin : Skycoord, or list/tuple, or string. Celestial coordinates to set.  See below.
+ra_unit : astropy unit; input unit for RA, defaults to u.hourangle  (i.e, hrs min sec)
+dec_unit : astropy unit; input unit for dec, defaults to u.deg</p>
+<p>If celestin is a string, some permissible formats are</p>
+<ul class="simple">
+<li>‘18:22:22.3  -0:18:33’   (defaults to ICRS or basically J2000)</li>
+<li>‘18:22:22.3  -0:18:33 2015’</li>
+<li>‘18 22 22.3  -0 18 33’</li>
+<li>‘18 22 22.3  -0 18 33 2015’</li>
+</ul>
+<p>Input units only apply if celestin is not already a SkyCoord.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.setnightevents">
+<code class="descname">setnightevents</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.setnightevents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.setnightevents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the events (sunset etc) for a single night.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.setsite">
+<code class="descname">setsite</code><span class="sig-paren">(</span><em>site</em>, <em>default_site='mdm'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.setsite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.setsite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the site on earth of the observation.</p>
+<dl class="docutils">
+<dt>site <span class="classifier-delimiter">:</span> <span class="classifier">obs_site instance or string</span></dt>
+<dd>if string, it is the key used for the site in the site dictionary.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="thorsky.thorskyclasses3.Observation.settime">
+<code class="descname">settime</code><span class="sig-paren">(</span><em>t</em>, <em>use_local_time=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#Observation.settime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.Observation.settime" title="Permalink to this definition">¶</a></dt>
+<dd><p>set Observation time t using the input ‘t’</p>
+<p>Note the instance variable ‘t’ is always stored as 
+in utc.  If use_local_time, then the input is assumed to be local
+zone time (though if t is already a Time instance this is ignored).
+Input t can be an ISO string, or a tuple of at least yr, month,
+day, hour, and minute.</p>
+<p>Note also that if use_local_time is True (default) and the site 
+switches back and forth from standard to daylight saving time, then
+one hour of clock time gets repeated in the autumn, and an hour gets
+skipped in the spring, which is tricky if localtime is input.  For
+example, specifying 2:30 AM Eastern time on the ‘spring forward’ night 
+sets to 3:30 AM Eastern Daylight time; 2:30 AM Eastern Standard does
+not happen on that night.  When Daylight Saving ends, a time in the 
+ambiguous hour reverts to standard, so there’s an hour of time that 
+you just can’t specifiy using local time input.</p>
+<dl class="docutils">
+<dt>t <span class="classifier-delimiter">:</span> <span class="classifier">a Time, or a string, or a tuple</span></dt>
+<dd><p class="first">time to which to set Observation attribute t.  If not already a Time,</p>
+<ul class="last simple">
+<li>if a string, can be anything the dateutil parser accepts,e.g.”2023-04-17 19:08:23”</li>
+<li>if a tuple, must be (year, month, day, hour, minute, [sec]) as ints; seconds are optional.</li>
+</ul>
+</dd>
+<dt>use_local_time <span class="classifier-delimiter">:</span> <span class="classifier">boolean </span></dt>
+<dd>whether input time is interpreted as local or not; default True.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyclasses3.get_sites">
+<code class="descclassname">thorsky.thorskyclasses3.</code><code class="descname">get_sites</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#get_sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.get_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dictionary of obs_site instances from the file of site parameters
+provided in the package.  Runs at import time and will probably never need to be
+called by a user</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="thorsky.thorskyclasses3.obs_site">
+<em class="property">class </em><code class="descclassname">thorsky.thorskyclasses3.</code><code class="descname">obs_site</code><span class="sig-paren">(</span><em>name='MDM Observatory [Kitt Peak]'</em>, <em>loc=(-1996199.0</em>, <em>-5037542.0</em>, <em>3356753.0)</em>, <em>tzstr='America/Phoenix'</em>, <em>tzstdabbr='MST'</em>, <em>tzdayabbr='MDT'</em>, <em>westheight=700.0</em>, <em>eastheight=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyclasses3.html#obs_site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyclasses3.obs_site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Site from which observations are taken.</p>
+<p>This initializes by default to Kitt Peak.  In practice it is 
+usually specified by using an abbreviation from the list of observatories
+distributed with the package, ‘observatories_rev.dat’.  
+Other arguments are keyworded.</p>
+<p>The core of this is an EarthLocation, but it also includes time zone 
+information and a guess at the height of the observatory above surrounding
+terrain for adjusting rise and set times for the sun and moon.</p>
+<p>Initialize an obs_site.</p>
+<dl class="docutils">
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>The full name of the observatory.  Defaults to “MDM Observatory [Kitt Peak]”</dd>
+<dt>loc <span class="classifier-delimiter">:</span> <span class="classifier">tuple or list </span></dt>
+<dd>Geocentric cartesian location, in meters.  Default (-1996199., -5037542., 3356753.)
+If you need to compute these for a new site, see the documentation for 
+astropy.coordinates.EarthLocation, in particular the “from_geodetic” method.</dd>
+<dt>tzstr <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>time zone name in format used by unix programs; default “America/Phoenix”.</dd>
+<dt>tzstdabbr, tzdayabbr <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>abbreviations for standard and daylight time in this zone; defaults “MST”,”MDT”</dd>
+<dt>westheight, eastheight :</dt>
+<dd>rough height of observatory above surrounding terrain, in meters: defaults 700. and 0.</dd>
+</dl>
+<p>Attributes:</p>
+<dl class="docutils">
+<dt>name <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Name of observatory.</dd>
+<dt>location <span class="classifier-delimiter">:</span> <span class="classifier">EarthLocation</span></dt>
+<dd>EarthLocation of the observation site.</dd>
+<dt>localtz <span class="classifier-delimiter">:</span> <span class="classifier">timezone</span></dt>
+<dd>Local time zone.</dd>
+<dt>localtzabbrev, localtzdayabbrev :</dt>
+<dd>Abbreviations for standard and daylight time.</dd>
+<dt>risealt, setalt <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>elevations at which the sun/moon rises or sets.</dd>
+<dt>axisdist <span class="classifier-delimiter">:</span> <span class="classifier">Quantity in distance units</span></dt>
+<dd>distance of site from earth’s rotation axis</dd>
+<dt>diurnalspeed <span class="classifier-delimiter">:</span> <span class="classifier">Quantity in velocity units</span></dt>
+<dd>speed of diurnal rotation at this site, for use in velocity corrections.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-thorsky.thorskyutil">
+<span id="thorsky-thorskyutil-module"></span><h2>thorsky.thorskyutil module<a class="headerlink" href="#module-thorsky.thorskyutil" title="Permalink to this headline">¶</a></h2>
+<p>thorskyutil.py – utility and miscellaneous time and the sky
+routines built mostly on astropy.</p>
+<dl class="function">
+<dt id="thorsky.thorskyutil.accumoon">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">accumoon</code><span class="sig-paren">(</span><em>time</em>, <em>obs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#accumoon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.accumoon" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute topocentric location and distance of moon to better accuracy.</p>
+<p>This is good to about 0.01 degrees</p>
+<dl class="docutils">
+<dt>time <span class="classifier-delimiter">:</span> <span class="classifier">Time</span></dt>
+<dd>An astropy Time.  This is converted to TT (terrestrial time) internally
+for the computations.</dd>
+<dt>obs <span class="classifier-delimiter">:</span> <span class="classifier">EarthLocation</span></dt>
+<dd>location on earth.</dd>
+</dl>
+<p>Returns:</p>
+<p>tuple of a SkyCoord and a distance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.altazparang">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">altazparang</code><span class="sig-paren">(</span><em>dec</em>, <em>ha</em>, <em>lat</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#altazparang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.altazparang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute altitude above horizon, azimuth, and parallactic angle.</p>
+<p>The parallactic angle is the position angle of the arc between the 
+object and the zenith, i.e. the position angle that points ‘straight up’
+when you’re looking at an object.  It is important for atmospheric
+refraction and dispersion compensation, which Filippenko discusses
+( 1982PASP…94..715F ).  Does not take small effects into
+account (polar motion, nutation, whatever) so is Lighter weight than 
+the astropy equivalents.</p>
+<p>Filippenko’s expression for the parallactic angle leaves it to the the user 
+to select the correct root of an inverse trig function; this is handled 
+automatically here by fully solving the astronomical triangle.</p>
+<dl class="docutils">
+<dt>dec <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Declination</dd>
+<dt>ha <span class="classifier-delimiter">:</span> <span class="classifier">Angle </span></dt>
+<dd>Hour angle (spherical astronomy) of the position, positive westward</dd>
+<dt>lat <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Latitude of site.</dd>
+</dl>
+<p>Returns</p>
+<p>tuple of (altitude, azimuth, parallactic), all of which are Angles.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.angle_between">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">angle_between</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#angle_between"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.angle_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the angle between two solar system body positions with
+the cartesian representation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.cel2localmatrix">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">cel2localmatrix</code><span class="sig-paren">(</span><em>lst</em>, <em>lat</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#cel2localmatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.cel2localmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute matrix to take celestial cartesian coordinates to topocentric
+(local observer centered) coordinates.</p>
+<p>Celestial coordinates are :assumed to already be in 
+equinox of date and have the standard definitions</p>
+<ul class="simple">
+<li>X toward ra=0, dec=0</li>
+<li>Y toward ra = 6 hr or 90 degrees, dec = 0</li>
+<li>Z toward the north celestial pole;</li>
+</ul>
+<p>Topocentric coordinates are a little unusual:</p>
+<ul class="simple">
+<li>X toward due west</li>
+<li>Y toward due south</li>
+<li>Z toward the zenith.</li>
+</ul>
+<dl class="docutils">
+<dt>lst <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Local sidereal time</dd>
+<dt>lat <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Geographic latitude</dd>
+</dl>
+<p>Returns: numpy 3x3 array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.cel2xyz">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">cel2xyz</code><span class="sig-paren">(</span><em>coord</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#cel2xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.cel2xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return normalized cartesian coordinates (direction cosines).</p>
+<p>coord : SkyCoord</p>
+<p>Returns: 
+numpy array of length three.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.currentFK5frame">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">currentFK5frame</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#currentFK5frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.currentFK5frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FK5 frame for the equinox of the time.</p>
+<p>time : astropy Time</p>
+<p>Returns: an astropy coordinate frame.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.currentgeocentframe">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">currentgeocentframe</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#currentgeocentframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.currentgeocentframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a PrecessedGeocentric frame for the equinox 
+spcified by the time.</p>
+<p>time : astropy Time</p>
+<p>Returns</p>
+<p>an astropy PrecessedGeocentric time.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.flmoon">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">flmoon</code><span class="sig-paren">(</span><em>n</em>, <em>nph</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#flmoon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.flmoon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the julian day at which moon phase nph occurs in lunation n</p>
+<p>Good to about 2 minutes, from Jean Meeus’ “Astronomical Formulae for
+Calculators”, 2nd edition, Willman-Bell.</p>
+<p>Parameters :
+n : int</p>
+<blockquote>
+<div>lunation number</div></blockquote>
+<dl class="docutils">
+<dt>nph <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>phase to compute; 0 = new, 1 = 1st quarter, 2 = full, 3 = last quarter</dd>
+</dl>
+<p>Returns:  Julian date as a float (not a Time)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.geocent">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">geocent</code><span class="sig-paren">(</span><em>geolong</em>, <em>geolat</em>, <em>height</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#geocent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.geocent" title="Permalink to this definition">¶</a></dt>
+<dd><p>geocentric XYZ coordinates for a location at a longitude,
+latitude and height above sea level.</p>
+<p>Retained because if one replaces the longitude input with the 
+sidereal time, the return is the XYZ in the equatorial frame 
+of date.  This is used in the lunar topocentric correction.</p>
+<dl class="docutils">
+<dt>geolong <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Geographic longitude, or LST to get celestial-aligned result</dd>
+<dt>geolat <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Geographic latitude</dd>
+<dt>height <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Height above sea level, which must be in meters.</dd>
+<dt>Returns: Tuple of astropy Quantities X, Y, Z, which </dt>
+<dd>are distances.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.getbrightest">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">getbrightest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#getbrightest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.getbrightest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal package routine to read the provided bright-star list for use
+in displays.</p>
+<p>The bright star list is an ascii list with one line per star.  It includes
+the J2000 coordinates as Cartesian triplets, which is useful later, the 
+V magnitude, the name, and a hexadecimal string that encodes an RGB color
+used to render the star.  This was crudely computed from the spectral type
+listed in the bright star catalog.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.ha_alt">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">ha_alt</code><span class="sig-paren">(</span><em>dec</em>, <em>lat</em>, <em>alt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#ha_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.ha_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an Angle giving the hour angle (from spherical astronomy, east
+or west of meridian, not the u.hourangle from astropy) at which 
+the declination dec reaches altitute alt.</p>
+<p>If the object is always above alt, an Angle of +1000 radians is returned.
+If always below, -1000 radians.</p>
+<p>Parameters :
+dec : Angle</p>
+<blockquote>
+<div>Declination of source.</div></blockquote>
+<dl class="docutils">
+<dt>lat <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Latitude of site.</dd>
+<dt>alt <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Height above horizon for computation.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.hrs_up">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">hrs_up</code><span class="sig-paren">(</span><em>timeup</em>, <em>timedown</em>, <em>evening</em>, <em>morning</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#hrs_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.hrs_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a TimeDelta giving how long an object is up during the 
+night, basically the intersection between the interval is’s ‘up’ above
+a given altitude, and the interval when it’s nighttime.</p>
+<p>Checks are implemented for circumpolar objects that can set and come back up.</p>
+<dl class="docutils">
+<dt>timeup <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>Time at which the object rises above an altitude</dd>
+<dt>timedown <span class="classifier-delimiter">:</span> <span class="classifier">astropy Time </span></dt>
+<dd>Time at which an object sets below a given altitude</dd>
+<dt>evening <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>Time of the beginning of the night</dd>
+<dt>morning <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>Time of the ending of the night</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.jd_moon_alt">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">jd_moon_alt</code><span class="sig-paren">(</span><em>alt</em>, <em>tguess</em>, <em>location</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#jd_moon_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.jd_moon_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time at which moon passes a given altitude.</p>
+<p>This really does have to be iterated since the moon moves fairly 
+quickly.</p>
+<dl class="docutils">
+<dt>alt <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>desired altitude.</dd>
+<dt>tguess <span class="classifier-delimiter">:</span> <span class="classifier">Time</span></dt>
+<dd>initial guess; this needs to be fairly close.</dd>
+</dl>
+<p>location : EarthLocation</p>
+<dl class="docutils">
+<dt>Returns </dt>
+<dd>a Time, or None if non-convergent.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.jd_sun_alt">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">jd_sun_alt</code><span class="sig-paren">(</span><em>alt</em>, <em>tguess</em>, <em>location</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#jd_sun_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.jd_sun_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>time at which the sun crosses a given elevation.</p>
+<p>Parameters:</p>
+<dl class="docutils">
+<dt>alt <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Desired altitude.</dd>
+<dt>tguess <span class="classifier-delimiter">:</span> <span class="classifier">Time </span></dt>
+<dd>Starting time for iteration.  This must be fairly 
+close so that the iteration coverges on the correct
+phenomenon (e.g., rise time, not set time).</dd>
+</dl>
+<p>location : EarthLocation</p>
+<dl class="docutils">
+<dt>Returns: Time if convergent</dt>
+<dd>None if non-convergent</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.local_midnight_Time">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">local_midnight_Time</code><span class="sig-paren">(</span><em>aTime</em>, <em>localtzone</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#local_midnight_Time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.local_midnight_Time" title="Permalink to this definition">¶</a></dt>
+<dd><p>find nearest local midnight.</p>
+<p>If it’s before noon local time, returns previous midnight; 
+if after noon, return next midnight.</p>
+<p>Parameters :</p>
+<p>aTime : astropy Time</p>
+<p>localtzone : timezone object.</p>
+<p>Returns</p>
+<p>Time.  This is not zone-aware, but should be correct.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.lpmoon">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">lpmoon</code><span class="sig-paren">(</span><em>time</em>, <em>obs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#lpmoon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.lpmoon" title="Permalink to this definition">¶</a></dt>
+<dd><p>low-precision moon position.</p>
+<p>Good to about 0.1 deg, from the 1992 Astronomical Almanac, p. D46.
+Note that input time is a float.</p>
+<dl class="docutils">
+<dt>time <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>Time expressed as a Julian Date</dd>
+<dt>obs <span class="classifier-delimiter">:</span> <span class="classifier">EarthLocation</span></dt>
+<dd>location of observatory.</dd>
+</dl>
+<p>Returns</p>
+<p>SkyCoord with a distance set, topocentric.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.lpsidereal">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">lpsidereal</code><span class="sig-paren">(</span><em>time</em>, <em>location</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#lpsidereal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.lpsidereal" title="Permalink to this definition">¶</a></dt>
+<dd><p>moderate-precision (1 sec) local sidereal time</p>
+<p>Adapted with minimal changes from skycalc routine. Native 
+astropy routines are unnecessarily precise for our purposes and
+rather slow.</p>
+<dl class="docutils">
+<dt>Parameters <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>time : Time
+location : EarthLocation</dd>
+<dt>Returns: </dt>
+<dd>Angle   (sidereal time is the hour angle of the equinox.)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.lpsun">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">lpsun</code><span class="sig-paren">(</span><em>time</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#lpsun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.lpsun" title="Permalink to this definition">¶</a></dt>
+<dd><p>low-precision position of the sun.</p>
+<p>Good to about 0.01 degree, from the 1990 Astronomical Almanac p. C24.
+At this level topocentric correction is not needed.</p>
+<p>time : astropy Time</p>
+<p>Returns</p>
+<p>a SkyCoord in the geocentric frame of epoch of date.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.lunskybright">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">lunskybright</code><span class="sig-paren">(</span><em>alpha</em>, <em>rho</em>, <em>kzen</em>, <em>altmoon</em>, <em>alt</em>, <em>moondist</em>, <em>sunalt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#lunskybright"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.lunskybright" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate sky brightness due to the moon, in V mag per square
+arcsec.</p>
+<p>Expressions are from  K. Krisciunas and B. E. Schaeffer (1991) 
+PASP 103, 1033.
+For comparison, ‘dark’ night sky is about 21.5 mag per square 
+arcsec.  Looking well away from the moon on a clear night with  
+full moon, one can expect roughly 18th mag per square arcsec.</p>
+<dl class="docutils">
+<dt>alpha <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>angle subtended by sun and moon at observer, converted
+internally to its supplement.</dd>
+<dt>rho <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>angular distance of object from the moon.</dd>
+<dt>kzen <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>zenight extinction coefficient (typically 0.15 or so for V)</dd>
+<dt>altmoon <span class="classifier-delimiter">:</span> <span class="classifier">Angle </span></dt>
+<dd>altitude of moon above horizon</dd>
+<dt>alt <span class="classifier-delimiter">:</span> <span class="classifier">Angle </span></dt>
+<dd>altitude of object above horizon</dd>
+<dt>moondist <span class="classifier-delimiter">:</span> <span class="classifier">Quantity</span></dt>
+<dd>distance to moon as an astropy Quantity</dd>
+</dl>
+<p>Returns</p>
+<p>float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.min_max_alt">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">min_max_alt</code><span class="sig-paren">(</span><em>lat</em>, <em>dec</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#min_max_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.min_max_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the mimimum and maximum altitudes of a celestial location.</p>
+<dl class="docutils">
+<dt>lat <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle</span></dt>
+<dd>Latitude of site.</dd>
+<dt>dec <span class="classifier-delimiter">:</span> <span class="classifier">astropy Angle</span></dt>
+<dd>declination of the object.</dd>
+</dl>
+<p>Returns :</p>
+<dl class="docutils">
+<dt>(minalt, maxalt) <span class="classifier-delimiter">:</span> <span class="classifier">both Astropy Angle</span></dt>
+<dd>tuple of minimum and maximum altitudes.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.nightevents">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">nightevents</code><span class="sig-paren">(</span><em>aTime</em>, <em>location</em>, <em>localtzone</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#nightevents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.nightevents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute phenomena for a given night.</p>
+<p>This is mostly a testbed that prints results directly.</p>
+<dl class="docutils">
+<dt>aTime <span class="classifier-delimiter">:</span> <span class="classifier">astropy TIme</span></dt>
+<dd>input time; if before noon, events of previous night are computed.</dd>
+</dl>
+<p>location : EarthLocation
+localtzone : timezone object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.phase_descr">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">phase_descr</code><span class="sig-paren">(</span><em>jd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#phase_descr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.phase_descr" title="Permalink to this definition">¶</a></dt>
+<dd><p>a human-readable string describing the phase of the moon.</p>
+<p>Given an input julian date, this determines interval to nearest 
+moon phase and writes a description.</p>
+<dl class="docutils">
+<dt>jd <span class="classifier-delimiter">:</span> <span class="classifier">float  (not a Time)</span></dt>
+<dd>Julian date.</dd>
+</dl>
+<p>Returns a string, e.g. “2.8 days before last quarter”</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.precessmatrix">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">precessmatrix</code><span class="sig-paren">(</span><em>t1</em>, <em>t2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#precessmatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.precessmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a matrix to transform celestial Cartesian coordinates from equinox t1 to equinox t2.</p>
+<p>The matrix is used for speed in precessing a large number of bright-star
+coordinates in the GUI program.</p>
+<dl class="docutils">
+<dt>t1 <span class="classifier-delimiter">:</span> <span class="classifier">Time</span></dt>
+<dd>time to transform from</dd>
+<dt>t2 <span class="classifier-delimiter">:</span> <span class="classifier">Time</span></dt>
+<dd>time to transform to</dd>
+</dl>
+<p>Returns: numpy 3x3 array</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.skyproject">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">skyproject</code><span class="sig-paren">(</span><em>rotmat</em>, <em>cartesian</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#skyproject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.skyproject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate an array of cartesian coordinates and do a stereographic projection
+around the resulting Z-axis.</p>
+<p>Used to figure out where to plot the bright stars on a map of the sky 
+above you at a given moment.  The rotation matrix is meant to transform
+from the input ICRS coordinates of the stars directly to the topocentric
+coordinates; the stereographic projection can then be done using array
+arithmetic without trig functions.  Use of numpy array operations makes this
+ridiculously fast.</p>
+<dl class="docutils">
+<dt>rotmat <span class="classifier-delimiter">:</span> <span class="classifier">numpy 3x3 array</span></dt>
+<dd>the rotation matrix, usually from ICRS directly to topocentric XYZ</dd>
+<dt>cartesian <span class="classifier-delimiter">:</span> <span class="classifier">numpy array 3 x N (or is it N x 3?) </span></dt>
+<dd>array of cartesian (usually ICRS) coordinates to be transformed and projected.</dd>
+</dl>
+<p>Returns</p>
+<dl class="docutils">
+<dt>tuple of numpy array of x coordinates, and numpy array of y coordinates</dt>
+<dd>projected onto a plane.  I believe x = 0, y = 1 is the north horizon point, 
+x = 1 and y = 0 is the east horizon point.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="thorsky.thorskyutil.thorconsts">
+<em class="property">class </em><code class="descclassname">thorsky.thorskyutil.</code><code class="descname">thorconsts</code><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#thorconsts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.thorconsts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constants that are used here and there.  Some are Quantities, 
+others are just floats. Not all are used.</p>
+<p>The planet-coefs are for series expansions for the phase functions
+of the planets, used in predicting apparent magnitude.  See code.</p>
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ALT15">
+<code class="descname">ALT15</code><em class="property"> = &lt;Quantity 41.7291 deg&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ALT15" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ALT20">
+<code class="descname">ALT20</code><em class="property"> = &lt;Quantity 29.8796 deg&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ALT20" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ALT30">
+<code class="descname">ALT30</code><em class="property"> = &lt;Quantity 19.278 deg&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ALT30" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ARCSEC_IN_RADIAN">
+<code class="descname">ARCSEC_IN_RADIAN</code><em class="property"> = 206264.8062471</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ARCSEC_IN_RADIAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ASTRO_UNIT">
+<code class="descname">ASTRO_UNIT</code><em class="property"> = 149597870660.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ASTRO_UNIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.DEG_IN_RADIAN">
+<code class="descname">DEG_IN_RADIAN</code><em class="property"> = 57.2957795130823</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.DEG_IN_RADIAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.EARTHRAD_IN_AU">
+<code class="descname">EARTHRAD_IN_AU</code><em class="property"> = 23454.7910556298</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.EARTHRAD_IN_AU" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.EQUAT_RAD">
+<code class="descname">EQUAT_RAD</code><em class="property"> = &lt;Quantity 6378137.0 m&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.EQUAT_RAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.FLATTEN">
+<code class="descname">FLATTEN</code><em class="property"> = 0.003352813</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.FLATTEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.HRS_IN_RADIAN">
+<code class="descname">HRS_IN_RADIAN</code><em class="property"> = 3.819718634205</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.HRS_IN_RADIAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.J2000">
+<code class="descname">J2000</code><em class="property"> = 2451545.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.J2000" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.J2000_Time">
+<code class="descname">J2000_Time</code><em class="property"> = &lt;Time object: scale='utc' format='jd' value=2451545.0&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.J2000_Time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.KMS_AUDAY">
+<code class="descname">KMS_AUDAY</code><em class="property"> = 1731.45683633</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.KMS_AUDAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.KZEN">
+<code class="descname">KZEN</code><em class="property"> = 0.172</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.KZEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.PI">
+<code class="descname">PI</code><em class="property"> = 3.14159265358979</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.PI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.PI_OVER_2">
+<code class="descname">PI_OVER_2</code><em class="property"> = 1.5707963267949</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.PI_OVER_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.PLANETNAMES">
+<code class="descname">PLANETNAMES</code><em class="property"> = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.PLANETNAMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.PLANETPHASECOEFS">
+<code class="descname">PLANETPHASECOEFS</code><em class="property"> = {'jupiter': -9.4, 'mars': (-0.4274213867715291, 1.2988953215615762, -1.601), 'mercury': (0.013363763741181076, -0.2480840022313796, 1.6325515091649714, -4.9390499605838665, 7.718379797341275, -6.131445146202686, 3.7914559630732065, -0.616), 'neptune': -6.87, 'saturn': -9.22, 'uranus': -7.19, 'venus': (0.09632276402543158, -0.5292390263170846, 1.2103116107350298, -0.05981450198047742, -4.38394)}</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.PLANETPHASECOEFS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.PLANET_TOL">
+<code class="descname">PLANET_TOL</code><em class="property"> = 3.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.PLANET_TOL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.RMOON">
+<code class="descname">RMOON</code><em class="property"> = 1738000.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.RMOON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.RSUN">
+<code class="descname">RSUN</code><em class="property"> = 696000000.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.RSUN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.SEC_IN_DAY">
+<code class="descname">SEC_IN_DAY</code><em class="property"> = 86400.0</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.SEC_IN_DAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.SIDDAY">
+<code class="descname">SIDDAY</code><em class="property"> = &lt;TimeDelta object: scale='None' format='jd' value=0.99726956638&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.SIDDAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.SIDRATE">
+<code class="descname">SIDRATE</code><em class="property"> = 1.0027379093</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.SIDRATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.SPEED_OF_LIGHT">
+<code class="descname">SPEED_OF_LIGHT</code><em class="property"> = 299792.458</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.SPEED_OF_LIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.SS_MASS">
+<code class="descname">SS_MASS</code><em class="property"> = 1.00134198</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.SS_MASS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.TWOPI">
+<code class="descname">TWOPI</code><em class="property"> = 6.28318530717959</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.TWOPI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="thorsky.thorskyutil.thorconsts.ZERO_TIMEDELTA">
+<code class="descname">ZERO_TIMEDELTA</code><em class="property"> = &lt;TimeDelta object: scale='None' format='jd' value=0.0&gt;</em><a class="headerlink" href="#thorsky.thorskyutil.thorconsts.ZERO_TIMEDELTA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.time_rounded_to_minute">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">time_rounded_to_minute</code><span class="sig-paren">(</span><em>tm</em>, <em>sep=' '</em>, <em>incl_date=False</em>, <em>incl_day=False</em>, <em>named_month=False</em>, <em>incl_year=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#time_rounded_to_minute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.time_rounded_to_minute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a datetime and returns a string giving the date correctly rounded to 
+nearest minute.  Calls strftime.</p>
+<p>tm : datetime
+sep : str, default = ‘ ‘</p>
+<blockquote>
+<div>separator between output fields</div></blockquote>
+<dl class="docutils">
+<dt>incl_date <span class="classifier-delimiter">:</span> <span class="classifier">boolean, default = False</span></dt>
+<dd>include calendar date in output</dd>
+<dt>incl_day <span class="classifier-delimiter">:</span> <span class="classifier">boolean, default = False</span></dt>
+<dd>include day of week in output string</dd>
+<dt>named_month <span class="classifier-delimiter">:</span> <span class="classifier">boolean, default = False</span></dt>
+<dd>output name of month instead of number</dd>
+<dt>incl_year <span class="classifier-delimiter">:</span> <span class="classifier">boolean, default = False</span></dt>
+<dd>include year in output string</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.true_airmass">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">true_airmass</code><span class="sig-paren">(</span><em>altit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#true_airmass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.true_airmass" title="Permalink to this definition">¶</a></dt>
+<dd><p>true airmass for an altitude.</p>
+<p>Based on a fit to Kitt Peak airmass tables, C. M. Snell &amp; A. M. Heiser, 1968,
+PASP, 80, 336.  Valid to about airmass 12, and beyond that just returns 
+secz minus 1.5, which won’t be quite right.</p>
+<dl class="docutils">
+<dt>altit <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Altitude above horizon.</dd>
+</dl>
+<p>Returns : float</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thorsky.thorskyutil.ztwilight">
+<code class="descclassname">thorsky.thorskyutil.</code><code class="descname">ztwilight</code><span class="sig-paren">(</span><em>alt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/thorsky/thorskyutil.html#ztwilight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#thorsky.thorskyutil.ztwilight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate twilight contribution to zenith sky brightness, in magnitudes
+per square arcsecond.</p>
+<p>Evaluates a polynomial approximation to observational data (see source for 
+reference) of zenith sky brightness (blue) as a function of the sun’s elevation
+from -0.9 degrees to -18 degrees.  For reference, 3 mag is roughly Nautical
+twilight and looks ‘pretty dark’; something like 10 mag is about the maximum
+for broadband sky flats in many cases.</p>
+<dl class="docutils">
+<dt>alt <span class="classifier-delimiter">:</span> <span class="classifier">Angle</span></dt>
+<dd>Sun’s elevation.  Meaningful range is -0.9 to -18 degrees.</dd>
+<dt>Returns </dt>
+<dd>float.  If the sun is up, returns 20; if the sun below -18, returns 0.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-thorsky">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-thorsky" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">thorsky package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-thorsky.thorskyclasses3">thorsky.thorskyclasses3 module</a></li>
+<li><a class="reference internal" href="#module-thorsky.thorskyutil">thorsky.thorskyutil module</a></li>
+<li><a class="reference internal" href="#module-thorsky">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/thorsky.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">thorsky 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, John Thorstensen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>
